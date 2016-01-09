@@ -4,11 +4,9 @@
 		<title>Todo</title>
 	</head>
 <body ng-controller="TodoAppController">
-	{{ todos }}
 	<hr>
 	<table border="0">
 		<tr>
-			<th>todo</th>
 			<th>todo</th>
 			<th>Created at</th>
 			<th>Last Update</th>
@@ -27,9 +25,7 @@
 	</table>
 	A todo will be added {{ ttodo }}
 	<hr>
-	<!--
 	{{ garbage }}
-	-->
 	<script src="js/angular/angular.js"></script>
 	<script>
 
@@ -43,22 +39,26 @@
 		TodoApp.controller('TodoAppController', ['$scope','$http', function($scope,$http){
 			$scope.name = 'Ok !!'
 			$scope.todos = [];
-			$http({
-				method: 'GET',
-				url: 'todo.json'
-			}).then(function success(response){
-				$scope.garbage = response;
-				$scope.todos = response.data;
-			},function failure(response){
-				$scope.garbage = response;
-			});
+			$http.get('http://local.todo.dev/')
+				.then(function success(response){
+					$scope.todos = response.data;
+				},function failure(response){
+					alert('fail');
+				});
 			$scope.addto = function(text){
 				if(text == undefined){
 
 				}
 				else{
-					$scope.todos.push({'name' : text});
-					$scope.ttodo = '';
+					$http.post('http://local.todo.dev/',{
+						name: text,
+					})
+						.then(function success(response){
+							$scope.garbage = response;
+							$scope.todos.push(response.data);
+						},function failure(){
+							alert('Post failed');
+						});
 				}
 			};
 		}]); 
