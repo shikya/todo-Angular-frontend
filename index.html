@@ -1,0 +1,69 @@
+<!Doctype html>
+<html ng-app="TodoApp">
+	<head>
+		<title>Todo</title>
+	</head>
+<body ng-controller="TodoAppController">
+	{{ todos }}
+	<hr>
+	<table border="0">
+		<tr>
+			<th>todo</th>
+			<th>todo</th>
+			<th>Created at</th>
+			<th>Last Update</th>
+		</tr>
+		<tr ng-repeat="todo in todos">
+			<td>{{ todo.name }}</td>
+			<td>{{ todo.created_at }}</td>
+			<td>{{ todo.updated_at }}</td>
+		</tr>
+		<tr>
+			<td><input type="text" ng-model="ttodo" placeholder="Write something"></td>
+			<td><button ng-click="addto(ttodo)">Add Todo</button></td>
+			<td></td>
+		</tr>
+
+	</table>
+	A todo will be added {{ ttodo }}
+	<hr>
+	<!--
+	{{ garbage }}
+	-->
+	<script src="js/angular/angular.js"></script>
+	<script>
+
+		/**
+		* TodoApp Module
+		*
+		* Description
+		*/
+		var TodoApp = angular.module('TodoApp', []);
+
+		TodoApp.controller('TodoAppController', ['$scope','$http', function($scope,$http){
+			$scope.name = 'Ok !!'
+			$scope.todos = [];
+			$http({
+				method: 'GET',
+				url: 'todo.json'
+			}).then(function success(response){
+				$scope.garbage = response;
+				$scope.todos = response.data;
+			},function failure(response){
+				$scope.garbage = response;
+			});
+			$scope.addto = function(text){
+				if(text == undefined){
+
+				}
+				else{
+					$scope.todos.push({'name' : text});
+					$scope.ttodo = '';
+				}
+			};
+		}]); 
+
+	</script>
+</body>
+</html>
+
