@@ -2,6 +2,105 @@
 <html ng-app="TodoApp">
 	<head>
 		<title>Todo</title>
+		<style>
+			/*
+			 * animations css stylesheet
+			 */
+
+			/* animate ngRepeat in phone listing */
+
+			.phone-listing.ng-enter,
+			.phone-listing.ng-leave,
+			.phone-listing.ng-move {
+			  -webkit-transition: 0.5s linear all;
+			  -moz-transition: 0.5s linear all;
+			  -o-transition: 0.5s linear all;
+			  transition: 0.5s linear all;
+			}
+
+			.phone-listing.ng-enter,
+			.phone-listing.ng-move {
+			  opacity: 0;
+			  height: 0;
+			  overflow: hidden;
+			}
+
+			.phone-listing.ng-move.ng-move-active,
+			.phone-listing.ng-enter.ng-enter-active {
+			  opacity: 1;
+			  height: 120px;
+			}
+
+			.phone-listing.ng-leave {
+			  opacity: 1;
+			  overflow: hidden;
+			}
+
+			.phone-listing.ng-leave.ng-leave-active {
+			  opacity: 0;
+			  height: 0;
+			  padding-top: 0;
+			  padding-bottom: 0;
+			}
+
+			/* cross fading between routes with ngView */
+
+			.view-container {
+			  position: relative;
+			}
+
+			.view-frame.ng-enter,
+			.view-frame.ng-leave {
+			  background: white;
+			  position: absolute;
+			  top: 0;
+			  left: 0;
+			  right: 0;
+			}
+
+			.view-frame.ng-enter {
+			  -webkit-animation: 0.5s fade-in;
+			  -moz-animation: 0.5s fade-in;
+			  -o-animation: 0.5s fade-in;
+			  animation: 0.5s fade-in;
+			  z-index: 100;
+			}
+
+			.view-frame.ng-leave {
+			  -webkit-animation: 0.5s fade-out;
+			  -moz-animation: 0.5s fade-out;
+			  -o-animation: 0.5s fade-out;
+			  animation: 0.5s fade-out;
+			  z-index: 99;
+			}
+
+			@keyframes fade-in {
+			  from { opacity: 0; }
+			  to { opacity: 1; }
+			}
+			@-moz-keyframes fade-in {
+			  from { opacity: 0; }
+			  to { opacity: 1; }
+			}
+			@-webkit-keyframes fade-in {
+			  from { opacity: 0; }
+			  to { opacity: 1; }
+			}
+
+			@keyframes fade-out {
+			  from { opacity: 1; }
+			  to { opacity: 0; }
+			}
+			@-moz-keyframes fade-out {
+			  from { opacity: 1; }
+			  to { opacity: 0; }
+			}
+			@-webkit-keyframes fade-out {
+			  from { opacity: 1; }
+			  to { opacity: 0; }
+			}
+
+		</style>
 	</head>
 <body ng-controller="TodoAppController">
 	<hr>
@@ -10,11 +109,13 @@
 			<th>todo</th>
 			<th>Created at</th>
 			<th>Last Update</th>
+			<th>Actions</th>
 		</tr>
-		<tr ng-repeat="todo in todos">
+		<tr ng-repeat="todo in todos" class="phone-listing">
 			<td>{{ todo.name }}</td>
 			<td>{{ todo.created_at }}</td>
 			<td>{{ todo.updated_at }}</td>
+			<td><button ng-click="delete(todo)">X</button></td>
 		</tr>
 		<tr>
 			<td><input type="text" ng-model="ttodo" placeholder="Write something"></td>
@@ -26,15 +127,20 @@
 	A todo will be added {{ ttodo }}
 	<hr>
 	{{ garbage }}
+	<script src="js/jquery/jquery.js"></script>
 	<script src="js/angular/angular.js"></script>
+	<script src="js/angular/angular-animate.js"></script>
+
 	<script>
 
-		/**
-		* TodoApp Module
-		*
-		* Description
-		*/
-		var TodoApp = angular.module('TodoApp', []);
+		var TodoApp = angular.module('TodoApp', [
+				'TodoAppControllers',
+				'TodoAppAnimation',
+			]);
+
+		var TodoAppControllers = angular.module('TodoAppControllers', []);
+
+		var TodoAppAnimation = angular.module('TodoAppAnimation',['ngAnimate']);
 
 		TodoApp.controller('TodoAppController', ['$scope','$http', function($scope,$http){
 			$scope.name = 'Ok !!'
@@ -60,6 +166,14 @@
 							alert('Post failed');
 						});
 				}
+			};
+			$scope.delete = function(todo){
+				$http.delete('http://local.todo.dev/'+todo.id).then(function success(response){
+					var index = $scope.todos.indexOf(todo);
+					$scope.todos.splice(index,1);
+				},function failure(){
+					alert('Fail');
+				});
 			};
 		}]); 
 
